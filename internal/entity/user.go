@@ -1,16 +1,18 @@
 package entity
 
 import (
-	"golang.org/x/crypto/bcrypt"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	Email     string    `json:"email" gorm:"uniqueIndex;not null"`
-	Password  string    `json:"-" gorm:"not null"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        string    `json:"id" gorm:"type:varchar(36);primaryKey"`
+	FullName  string    `json:"full_name" gorm:"type:varchar(150)"`
+	Email     string    `json:"email" gorm:"type:varchar(150);uniqueIndex;not null"`
+	Password  string    `json:"-" gorm:"type:varchar(255);not null"`
+	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }
 
 func (u *User) HashPassword() error {
