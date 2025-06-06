@@ -3,7 +3,6 @@ package database
 import (
 	"backend/internal/config"
 	"backend/internal/entity"
-	"fmt"
 	"log"
 	"time"
 
@@ -12,14 +11,7 @@ import (
 )
 
 func NewConnection(cfg *config.Config) (*gorm.DB, error) {
-	dsn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s",
-		cfg.Database.Host,
-		cfg.Database.User,
-		cfg.Database.Password,
-		cfg.Database.DBName,
-		cfg.Database.Port,
-	)
+	dsn := cfg.Database.DBUrl
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
