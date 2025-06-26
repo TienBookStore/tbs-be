@@ -4,7 +4,8 @@ import (
 	"backend/internal/config"
 	"backend/internal/database"
 	"backend/internal/handler"
-	"backend/internal/repository"
+	otpRepo "backend/internal/repository/otp"
+	userRepo "backend/internal/repository/user"
 	"backend/internal/service"
 
 	"gorm.io/gorm"
@@ -20,10 +21,10 @@ func NewContainer(cfg *config.Config) (*Container, error) {
 	if err != nil {
 		return nil, err
 	}
-	
-	userRepo := repository.NewUserRepository(db)
 
-	authService := service.NewAuthService(userRepo)
+	userRepo := userRepo.NewUserRepository(db)
+	otpRepo := otpRepo.NewOtpRepository(db)
+	authService := service.NewAuthService(userRepo, otpRepo)
 
 	authHandler := handler.NewAuthHandler(authService)
 

@@ -34,11 +34,11 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "...",
+			"messeage": err.Error(),
 		})
 		return
 	}
-	
+
 	user, err := h.authService.SignUp(req)
 
 	if err != nil {
@@ -49,7 +49,11 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "succesful",
+		"message": "Đăng kí thành công, vui lòng kiểm tra email.",
 		"user":    user,
 	})
+}
+
+func (h *AuthHandler) VerifyOTPSignUp(c *gin.Context) {
+	
 }
