@@ -55,5 +55,21 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 }
 
 func (h *AuthHandler) VerifyOTPSignUp(c *gin.Context) {
-	
+	var req request.ReqVerifyOTP
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if err := h.authService.VerifyOTPSignUp(req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "active tài khoản thành công",
+	})
 }

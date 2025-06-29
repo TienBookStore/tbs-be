@@ -45,6 +45,6 @@ func (r *userRepositoryImpl) CreateUser(userData *entity.User) error {
 	return r.db.Debug().Create(userData).Error
 }
 
-func (r *userRepositoryImpl) ActivateUser(email string) error {
-	return r.db.Model(&entity.User{}).Where("email = ?", email).Update("is_active", true).Error
+func (r *userRepositoryImpl) UpdateUser(user *entity.User) error {
+	return r.db.Save(user).Error
 }

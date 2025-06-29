@@ -14,7 +14,7 @@ var (
 	smtpPassword = "owushoxkwzfmfxwu"
 )
 
-func SendEmail(toEmail, subject, body string) error {
+func SendOTPByEmail(toEmail, subject, body string) error {
 	from := smtpUsername
 	password := smtpPassword
 

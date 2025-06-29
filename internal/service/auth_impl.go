@@ -9,6 +9,7 @@ import (
 	"backend/internal/utils"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -66,8 +67,13 @@ func (s *authServiceImpl) SignUp(req request.ReqSignUp) (*entity.User, error) {
 	}
 
 	newOTP := &entity.OTP{
-		Email: req.Email,
-		Code:  codeOTP,
+		Email:     req.Email,
+		Code:      codeOTP,
+		ExpiresAt: time.Now().Add(5 * time.Minute),
+	}
+
+	if err := s.otpRepo.DeleteOTP(req.Email); err != nil {
+
 	}
 
 	if err := s.otpRepo.CreateOTP(newOTP); err != nil {
@@ -77,9 +83,55 @@ func (s *authServiceImpl) SignUp(req request.ReqSignUp) (*entity.User, error) {
 	subject := "Mã OTP xác thực tài khoản"
 	body := fmt.Sprintf("Mã OTP của bạn là: %s. Mã có hiệu lực 5 phút.", codeOTP)
 
-	if err := utils.SendEmail(req.Email, subject, body); err != nil {
+	if err := utils.SendOTPByEmail(req.Email, subject, body); err != nil {
 		return nil, err
 	}
 
 	return newUser, nil
+}
+
+func (s *authServiceImpl) VerifyOTPSignUp(req request.ReqVerifyOTP) error {
+	otp, err := s.otpRepo.GetOTPByEmail(req.Email)
+
+	if err != nil {
+		return err
+	}
+
+	if otp == nil {
+		return errors.New("OTP không tồn tại hoặc đã hết hạn, vui lòng gửi lại OTP")
+	}
+
+	if otp.Code != req.Code {
+		return errors.New("Mã OTP không đúng")
+	}
+
+	if time.Now().After(otp.ExpiresAt) {
+		return errors.New("Mã OTP đã hết hạn, vui lòng gửi lại OTP")
+	}
+
+	user, err := s.userRepo.GetUserByEmail(req.Email)
+
+	if err != nil {
+		return err
+	}
+
+	if user == nil {
+		return errors.New("Email không tồn tại")
+	}
+
+	if user.IsActive {
+		return errors.New("Email đã được kích hoạt")
+	}
+
+	user.IsActive = true
+
+	if err := s.userRepo.UpdateUser(user); err != nil {
+		return err
+	}
+
+	if err := s.otpRepo.DeleteOTP(otp.Email); err != nil {
+
+	}
+
+	return nil
 }

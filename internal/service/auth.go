@@ -8,4 +8,5 @@ import (
 type AuthService interface {
 	GetMe() string
 	SignUp(req request.ReqSignUp) (*entity.User, error)
+	VerifyOTPSignUp(req request.ReqVerifyOTP) error
 }
