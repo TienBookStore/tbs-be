@@ -12,7 +12,7 @@ import (
 func main() {
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatal("Tải cấu hình như cặc: ", err)
+		log.Fatal("Không thể tải cấu hình: ", err)
 	}
 	container, err := common.NewContainer(cfg)
 	if err != nil {
