@@ -135,3 +135,34 @@ func (s *authServiceImpl) VerifyOTPSignUp(req request.ReqVerifyOTP) error {
 
 	return nil
 }
+
+func (s *authServiceImpl) ResendOTP(req request.ReqResendOTP) error {
+	codeOTP, err := utils.GenerateOTP(6)
+
+	if err != nil {
+		return fmt.Errorf("Không tạo được otp", err)
+	}
+
+	newOTP := &entity.OTP{
+		Email:     req.Email,
+		Code:      codeOTP,
+		ExpiresAt: time.Now().Add(5 * time.Minute),
+	}
+
+	if err := s.otpRepo.DeleteOTP(req.Email); err != nil {
+
+	}
+
+	if err := s.otpRepo.CreateOTP(newOTP); err != nil {
+		return err
+	}
+
+	subject := "Mã OTP xác thực tài khoản"
+	body := fmt.Sprintf("Mã OTP của bạn là: %s. Mã có hiệu lực 5 phút.", codeOTP)
+
+	if err := utils.SendOTPByEmail(req.Email, subject, body); err != nil {
+		return err
+	}
+
+	return nil
+}

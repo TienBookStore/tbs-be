@@ -53,3 +53,4 @@ func (r *otpReposioryImpl) DeleteOTP(email string) error {
 
 	return nil
 }
+

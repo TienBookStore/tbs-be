@@ -9,4 +9,5 @@ type AuthService interface {
 	GetMe() string
 	SignUp(req request.ReqSignUp) (*entity.User, error)
 	VerifyOTPSignUp(req request.ReqVerifyOTP) error
+	ResendOTP(req request.ReqResendOTP) error
 }

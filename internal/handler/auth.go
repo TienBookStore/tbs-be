@@ -65,11 +65,35 @@ func (h *AuthHandler) VerifyOTPSignUp(c *gin.Context) {
 	}
 
 	if err := h.authService.VerifyOTPSignUp(req); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "active tài khoản thành công",
+	})
+}
+
+func (h *AuthHandler) ResendOTPSignUp(c *gin.Context) {
+	var req request.ReqResendOTP
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if err := h.authService.ResendOTP(req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Gửi OTP thành công vui lòng kiểm tra email",
 	})
 }
