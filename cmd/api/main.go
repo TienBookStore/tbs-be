@@ -12,13 +12,16 @@ import (
 func main() {
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatal("Tải cấu hình như cặc: ", err)
+		log.Fatal("Không thể tải cấu hình: ", err)
 	}
 	container, err := common.NewContainer(cfg)
 	if err != nil {
 		log.Fatal("Khởi tạo vùng chứa thất bại: ", err)
 	}
 	r := gin.Default()
+
+	config.SetUpCors(r)
+	
 	api := r.Group("/api/bao-tien")
 	router.SetupAuthRoute(api, container.AuthHandler)
 

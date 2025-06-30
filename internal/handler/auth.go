@@ -3,6 +3,7 @@ package handler
 import (
 	"backend/internal/request"
 	"backend/internal/service"
+	"backend/internal/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -64,20 +65,20 @@ func (h *AuthHandler) VerifyOTPSignUp(c *gin.Context) {
 		return
 	}
 
-	if err := h.authService.VerifyOTPSignUp(req); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+	user, err := h.authService.VerifyOTPSignUp(req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "active tài khoản thành công",
+		"user":    user,
 	})
 }
 
-func (h *AuthHandler) ResendOTPSignUp(c *gin.Context) {
-	var req request.ReqResendOTP
+func (h *AuthHandler) Login(c *gin.Context) {
+	var req request.ReqLogin
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -86,14 +87,30 @@ func (h *AuthHandler) ResendOTPSignUp(c *gin.Context) {
 		return
 	}
 
-	if err := h.authService.ResendOTP(req); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+	user, err := h.authService.Login(req)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
+	tokenString, err := utils.GenerateJWT(user.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Không tạo được token"})
+		return
+	}
+
+	c.SetCookie(
+		"jwt",
+		tokenString,
+		3600*24,
+		"/",
+		"",
+		false,
+		true,
+	)
+
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Gửi OTP thành công vui lòng kiểm tra email",
+		"message": "Đăng nhập thành công",
+		"user":    user,
 	})
 }

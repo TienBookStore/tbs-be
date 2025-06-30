@@ -10,7 +10,7 @@ import (
 var (
 	smtpHost     = "smtp.gmail.com"
 	smtpPort     = 587
-	smtpUsername = "your@gmail.com"
+	smtpUsername = "ngvantien1526@gmail.com"
 	smtpPassword = "owushoxkwzfmfxwu"
 )
 
