@@ -56,10 +56,6 @@ func (s *authServiceImpl) SignUp(req request.ReqSignUp) (*entity.User, error) {
 		return nil, errors.New("Không tạo được")
 	}
 
-	if err != nil {
-		return nil, err
-	}
-
 	codeOTP, err := utils.GenerateOTP(6)
 
 	if err != nil {
@@ -77,7 +73,7 @@ func (s *authServiceImpl) SignUp(req request.ReqSignUp) (*entity.User, error) {
 	}
 
 	if err := s.otpRepo.CreateOTP(newOTP); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Không tạo trong db được otp: %v", err)
 	}
 
 	subject := "Mã OTP xác thực tài khoản"
@@ -90,48 +86,70 @@ func (s *authServiceImpl) SignUp(req request.ReqSignUp) (*entity.User, error) {
 	return newUser, nil
 }
 
-func (s *authServiceImpl) VerifyOTPSignUp(req request.ReqVerifyOTP) error {
+func (s *authServiceImpl) VerifyOTPSignUp(req request.ReqVerifyOTP) (*entity.User, error) {
 	otp, err := s.otpRepo.GetOTPByEmail(req.Email)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if otp == nil {
-		return errors.New("OTP không tồn tại hoặc đã hết hạn, vui lòng gửi lại OTP")
+		return nil, errors.New("OTP không tồn tại hoặc đã hết hạn, vui lòng gửi lại OTP")
 	}
 
 	if otp.Code != req.Code {
-		return errors.New("Mã OTP không đúng")
+		return nil, errors.New("Mã OTP không đúng")
 	}
 
 	if time.Now().After(otp.ExpiresAt) {
-		return errors.New("Mã OTP đã hết hạn, vui lòng gửi lại OTP")
+		return nil, errors.New("Mã OTP đã hết hạn, vui lòng gửi lại OTP")
 	}
 
 	user, err := s.userRepo.GetUserByEmail(req.Email)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if user == nil {
-		return errors.New("Email không tồn tại")
+		return nil, errors.New("Email không tồn tại")
 	}
 
 	if user.IsActive {
-		return errors.New("Email đã được kích hoạt")
+		return nil, errors.New("Email đã được kích hoạt")
 	}
 
 	user.IsActive = true
 
 	if err := s.userRepo.UpdateUser(user); err != nil {
-		return err
+		return nil, err
 	}
 
 	if err := s.otpRepo.DeleteOTP(otp.Email); err != nil {
 
 	}
 
-	return nil
+	return user, nil
+}
+
+func (s *authServiceImpl) Login(req request.ReqLogin) (*entity.User, error) {
+	user, err := s.userRepo.GetUserByEmail(req.Email)
+
+	if err != nil {
+		return nil, fmt.Errorf("Lỗi khi lấy thông tin người dùng: %v", err)
+	}
+
+	if user == nil {
+		return nil, customErrors.ErrorUserNotFound
+	}
+
+	if !user.IsActive {
+		return nil, customErrors.ErrorUserNotActive
+	}
+
+	if !user.CheckPassword(req.Password) {
+		return nil, customErrors.ErrorInvalidCredentials
+	}
+
+	return user, nil
 }

@@ -19,6 +19,9 @@ func main() {
 		log.Fatal("Khởi tạo vùng chứa thất bại: ", err)
 	}
 	r := gin.Default()
+
+	config.SetUpCors(r)
+	
 	api := r.Group("/api/bao-tien")
 	router.SetupAuthRoute(api, container.AuthHandler)
 
