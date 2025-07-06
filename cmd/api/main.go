@@ -21,9 +21,10 @@ func main() {
 	r := gin.Default()
 
 	config.SetUpCors(r)
-	
+
 	api := r.Group("/api/bao-tien")
 	router.SetupAuthRoute(api, container.AuthHandler)
+	router.SetupCategoryRoute(api, container.CategoryHandler)
 
 	log.Printf("Server đang chạy ở cổng: %s", cfg.Server.Port)
 	if err := r.Run(":" + cfg.Server.Port); err != nil {

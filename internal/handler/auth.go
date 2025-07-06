@@ -2,7 +2,8 @@ package handler
 
 import (
 	"backend/internal/request"
-	"backend/internal/service"
+	service "backend/internal/service/auth"
+
 	"backend/internal/utils"
 	"net/http"
 
