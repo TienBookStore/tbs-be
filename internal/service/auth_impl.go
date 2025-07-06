@@ -68,8 +68,16 @@ func (s *authServiceImpl) SignUp(req request.ReqSignUp) (*entity.User, error) {
 		ExpiresAt: time.Now().Add(5 * time.Minute),
 	}
 
-	if err := s.otpRepo.DeleteOTP(req.Email); err != nil {
+	exists, err = s.otpRepo.CheckExistsOTPByEmail(req.Email)
 
+	if err != nil {
+		return nil, fmt.Errorf("Lỗi kiểm tra OTP", err)
+	}
+
+	if exists {
+		if err := s.otpRepo.DeleteOTP(req.Email); err != nil {
+			return nil, fmt.Errorf("Lỗi xóa OTP", err)
+		}
 	}
 
 	if err := s.otpRepo.CreateOTP(newOTP); err != nil {
@@ -125,30 +133,16 @@ func (s *authServiceImpl) VerifyOTPSignUp(req request.ReqVerifyOTP) (*entity.Use
 		return nil, err
 	}
 
-	if err := s.otpRepo.DeleteOTP(otp.Email); err != nil {
-
-	}
-
-	return user, nil
-}
-
-func (s *authServiceImpl) Login(req request.ReqLogin) (*entity.User, error) {
-	user, err := s.userRepo.GetUserByEmail(req.Email)
+	exists, err := s.otpRepo.CheckExistsOTPByEmail(req.Email)
 
 	if err != nil {
-		return nil, fmt.Errorf("Lỗi khi lấy thông tin người dùng: %v", err)
+		return nil, fmt.Errorf("Lỗi kiểm tra OTP", err)
 	}
 
-	if user == nil {
-		return nil, customErrors.ErrorUserNotFound
-	}
-
-	if !user.IsActive {
-		return nil, customErrors.ErrorUserNotActive
-	}
-
-	if !user.CheckPassword(req.Password) {
-		return nil, customErrors.ErrorInvalidCredentials
+	if exists {
+		if err := s.otpRepo.DeleteOTP(req.Email); err != nil {
+			return nil, fmt.Errorf("Lỗi xóa OTP", err)
+		}
 	}
 
 	return user, nil
@@ -183,4 +177,26 @@ func (s *authServiceImpl) ResendOTP(req request.ReqResendOTP) error {
 	}
 
 	return nil
+}
+
+func (s *authServiceImpl) Login(req request.ReqLogin) (*entity.User, error) {
+	user, err := s.userRepo.GetUserByEmail(req.Email)
+
+	if err != nil {
+		return nil, fmt.Errorf("Lỗi khi lấy thông tin người dùng: %v", err)
+	}
+
+	if user == nil {
+		return nil, customErrors.ErrorUserNotFound
+	}
+
+	if !user.IsActive {
+		return nil, customErrors.ErrorUserNotActive
+	}
+
+	if !user.CheckPassword(req.Password) {
+		return nil, customErrors.ErrorInvalidCredentials
+	}
+
+	return user, nil
 }

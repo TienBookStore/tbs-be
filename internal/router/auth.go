@@ -14,5 +14,7 @@ func SetupAuthRoute(router *gin.RouterGroup, authHandler *handler.AuthHandler) {
 		auth.POST("/sign-up", authHandler.SignUp)
 		auth.POST("/sign-up/verify-otp", authHandler.VerifyOTPSignUp)
 		auth.POST("/login", authHandler.Login)
+		auth.POST("/sign-up/resend-otp", authHandler.ResendOTPSignUp)
+		auth.POST("/logout", authHandler.Logout)
 	}
 }

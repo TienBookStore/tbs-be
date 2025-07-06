@@ -77,6 +77,28 @@ func (h *AuthHandler) VerifyOTPSignUp(c *gin.Context) {
 	})
 }
 
+func (h *AuthHandler) ResendOTPSignUp(c *gin.Context) {
+	var req request.ReqResendOTP
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if err := h.authService.ResendOTP(req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Gửi OTP thành công vui lòng kiểm tra email",
+	})
+}
+
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req request.ReqLogin
 
@@ -113,4 +135,9 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		"message": "Đăng nhập thành công",
 		"user":    user,
 	})
+}
+
+func (h *AuthHandler) Logout(c *gin.Context) {
+	c.SetCookie("jwt", "", -1, "/", "", false, true)
+	c.JSON(http.StatusOK, gin.H{"message": "đăng xuất thành công."})
 }
