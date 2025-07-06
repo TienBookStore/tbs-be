@@ -12,12 +12,13 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Port string
-	Env  string
+	Port      string
+	Env       string
+	JwtSecret string
 }
 
 type DatabaseConfig struct {
-	DBUrl     string
+	DBUrl string
 }
 
 func Load() (*Config, error) {
@@ -27,8 +28,9 @@ func Load() (*Config, error) {
 
 	return &Config{
 		Server: ServerConfig{
-			Port: getEnv("PORT", "8080"),
-			Env:  getEnv("ENV", "development"),
+			Port:      getEnv("PORT", "8080"),
+			Env:       getEnv("ENV", "development"),
+			JwtSecret: getEnv("JWT_SECRET", "99322be7-6f9c-4de3-af5c-f024539ab0b2"),
 		},
 		Database: DatabaseConfig{
 			DBUrl: getEnv("DB_URL", ""),

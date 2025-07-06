@@ -23,7 +23,7 @@ func main() {
 	config.SetUpCors(r)
 
 	api := r.Group("/api/bao-tien")
-	router.SetupAuthRoute(api, container.AuthHandler)
+	router.SetupAuthRoute(api, container.AuthHandler, container.UserRepository, cfg.Server.JwtSecret)
 	router.SetupCategoryRoute(api, container.CategoryHandler)
 
 	log.Printf("Server đang chạy ở cổng: %s", cfg.Server.Port)

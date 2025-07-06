@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"backend/internal/entity"
 	"backend/internal/request"
 	service "backend/internal/service/auth"
 
@@ -12,17 +13,33 @@ import (
 
 type AuthHandler struct {
 	authService service.AuthService
+	JwtSecret   string
 }
 
-func NewAuthHandler(authService service.AuthService) *AuthHandler {
+func NewAuthHandler(authService service.AuthService, jwtSecret string) *AuthHandler {
 	return &AuthHandler{
 		authService: authService,
+		JwtSecret:   jwtSecret,
 	}
 }
 
 func (h *AuthHandler) GetMe(c *gin.Context) {
-	result := h.authService.GetMe()
-	c.JSON(http.StatusOK, gin.H{"message": result})
+	user, exists := c.Get("user")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	user, ok := user.(*entity.User)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"user": user,
+	})
 }
 
 func (h *AuthHandler) Welcome(c *gin.Context) {
@@ -116,7 +133,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	tokenString, err := utils.GenerateJWT(user.ID)
+	tokenString, err := utils.GenerateJWT(user.ID, h.JwtSecret)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Không tạo được token"})
 		return

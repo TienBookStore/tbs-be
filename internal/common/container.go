@@ -17,6 +17,7 @@ type Container struct {
 	DB              *gorm.DB
 	AuthHandler     *handler.AuthHandler
 	CategoryHandler *handler.CategoryHandler
+	UserRepository  userRepo.UserRepository
 }
 
 func NewContainer(cfg *config.Config) (*Container, error) {
@@ -32,11 +33,13 @@ func NewContainer(cfg *config.Config) (*Container, error) {
 	authService := auth.NewAuthService(userRepo, otpRepo)
 	cateService := category.NewCategoryService(cateRepo)
 
-	authHandler := handler.NewAuthHandler(authService)
+	authHandler := handler.NewAuthHandler(authService, cfg.Server.JwtSecret)
 	cateHandler := handler.NewCategoryHandler(cateService)
 
 	return &Container{
 		AuthHandler:     authHandler,
 		CategoryHandler: cateHandler,
+		UserRepository:  userRepo,
+		DB:              db,
 	}, nil
 }

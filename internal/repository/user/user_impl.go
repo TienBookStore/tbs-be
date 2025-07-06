@@ -48,3 +48,17 @@ func (r *userRepositoryImpl) CreateUser(userData *entity.User) error {
 func (r *userRepositoryImpl) UpdateUser(user *entity.User) error {
 	return r.db.Save(user).Error
 }
+
+func (r *userRepositoryImpl) GetUserByID(id string) (*entity.User, error) {
+	var user entity.User
+
+	err := r.db.Where("id = ?", id).First(&user).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+
+		return nil, err
+	}	
+	return &user, nil
+}
