@@ -7,13 +7,15 @@ import (
 )
 
 type User struct {
-	ID        string    `json:"id" gorm:"type:varchar(36);primaryKey"`
-	FullName  string    `json:"full_name" gorm:"type:varchar(150)"`
-	Email     string    `json:"email" gorm:"type:varchar(150);uniqueIndex;not null"`
-	IsActive  bool      `json:"is_active" gorm:"default:false"`
-	Password  string    `json:"-" gorm:"type:varchar(255);not null"`
-	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	ID          string    `json:"id" gorm:"type:varchar(36);primaryKey"`
+	FullName    string    `json:"full_name" gorm:"type:varchar(150)"`
+	Email       string    `json:"email" gorm:"type:varchar(150);uniqueIndex;not null"`
+	IsActive    bool      `json:"is_active" gorm:"default:false"`
+	Address     string    `json:"address"`
+	PhoneNumber string    `json:"phone_number"`
+	Password    string    `json:"-" gorm:"type:varchar(255);not null"`
+	CreatedAt   time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt   time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }
 
 func (u *User) HashPassword() error {

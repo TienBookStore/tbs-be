@@ -68,8 +68,16 @@ func (s *authServiceImpl) SignUp(req request.ReqSignUp) (*entity.User, error) {
 		ExpiresAt: time.Now().Add(5 * time.Minute),
 	}
 
-	if err := s.otpRepo.DeleteOTP(req.Email); err != nil {
+	exists, err = s.otpRepo.CheckExistsOTPByEmail(req.Email)
 
+	if err != nil {
+		return nil, fmt.Errorf("Lỗi kiểm tra OTP", err)
+	}
+
+	if exists {
+		if err := s.otpRepo.DeleteOTP(req.Email); err != nil {
+			return nil, fmt.Errorf("Lỗi xóa OTP", err)
+		}
 	}
 
 	if err := s.otpRepo.CreateOTP(newOTP); err != nil {
@@ -125,11 +133,50 @@ func (s *authServiceImpl) VerifyOTPSignUp(req request.ReqVerifyOTP) (*entity.Use
 		return nil, err
 	}
 
-	if err := s.otpRepo.DeleteOTP(otp.Email); err != nil {
+	exists, err := s.otpRepo.CheckExistsOTPByEmail(req.Email)
 
+	if err != nil {
+		return nil, fmt.Errorf("Lỗi kiểm tra OTP", err)
+	}
+
+	if exists {
+		if err := s.otpRepo.DeleteOTP(req.Email); err != nil {
+			return nil, fmt.Errorf("Lỗi xóa OTP", err)
+		}
 	}
 
 	return user, nil
+}
+
+func (s *authServiceImpl) ResendOTP(req request.ReqResendOTP) error {
+	codeOTP, err := utils.GenerateOTP(6)
+
+	if err != nil {
+		return fmt.Errorf("Không tạo được otp", err)
+	}
+
+	newOTP := &entity.OTP{
+		Email:     req.Email,
+		Code:      codeOTP,
+		ExpiresAt: time.Now().Add(5 * time.Minute),
+	}
+
+	if err := s.otpRepo.DeleteOTP(req.Email); err != nil {
+
+	}
+
+	if err := s.otpRepo.CreateOTP(newOTP); err != nil {
+		return err
+	}
+
+	subject := "Mã OTP xác thực tài khoản"
+	body := fmt.Sprintf("Mã OTP của bạn là: %s. Mã có hiệu lực 5 phút.", codeOTP)
+
+	if err := utils.SendOTPByEmail(req.Email, subject, body); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *authServiceImpl) Login(req request.ReqLogin) (*entity.User, error) {
