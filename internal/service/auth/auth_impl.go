@@ -63,6 +63,7 @@ func (s *authServiceImpl) SignUp(req request.ReqSignUp) (*entity.User, error) {
 	}
 
 	newOTP := &entity.OTP{
+		ID:        uuid.NewString(),
 		Email:     req.Email,
 		Code:      codeOTP,
 		ExpiresAt: time.Now().Add(5 * time.Minute),

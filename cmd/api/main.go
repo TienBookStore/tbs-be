@@ -24,7 +24,7 @@ func main() {
 
 	api := r.Group("/api/bao-tien")
 	router.SetupAuthRoute(api, container.AuthHandler, container.UserRepository, cfg.Server.JwtSecret)
-	router.SetupCategoryRoute(api, container.CategoryHandler)
+	router.SetupCategoryRoute(api, container.CategoryHandler, container.UserRepository, cfg.Server.JwtSecret)
 
 	log.Printf("Server đang chạy ở cổng: %s", cfg.Server.Port)
 	if err := r.Run(":" + cfg.Server.Port); err != nil {
