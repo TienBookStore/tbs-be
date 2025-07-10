@@ -60,21 +60,19 @@ func (s *categoryServiceImpl) GetAllCategories() ([]*entity.Category, error) {
 	return categoryPtrs, nil
 }
 
-func (s *categoryServiceImpl) UpdateCategory(req req.ReqUpdateCategory) (*entity.Category, error) {
-	category, err := s.cateRepo.GetCategoryByID(req.ID)
-
+func (s *categoryServiceImpl) UpdateCategory(id string, req req.ReqUpdateCategory) (*entity.Category, error) {
+	category, err := s.cateRepo.GetCategoryByID(id)
 	if err != nil {
 		return nil, err
 	}
-
 	if category == nil {
 		return nil, errors.New("category not found")
 	}
 
 	category.Name = req.Name
 	category.Slug = utils.GenerateSlug(req.Name)
-	updatedCategory, err := s.cateRepo.UpdateCategory(category)
 
+	updatedCategory, err := s.cateRepo.UpdateCategory(category)
 	if err != nil {
 		return nil, err
 	}

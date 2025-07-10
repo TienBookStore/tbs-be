@@ -9,6 +9,6 @@ type CategoryService interface {
 	CreateCategory(name string) (*entity.Category, error)
 	GetCategoryByID(id string) (*entity.Category, error)
 	GetAllCategories() ([]*entity.Category, error)
-	UpdateCategory(request.ReqUpdateCategory) (*entity.Category, error)
+	UpdateCategory(id string, req request.ReqUpdateCategory) (*entity.Category, error)
 	DeleteCategory(id string) error
 }

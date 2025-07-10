@@ -84,24 +84,26 @@ func (h *CategoryHandler) GetAll(c *gin.Context) {
 }
 
 func (h *CategoryHandler) Update(c *gin.Context) {
+	id := c.Param("id")
+
 	var req request.ReqUpdateCategory
-	if err := c.ShouldBind(&req); err != nil {
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
+		return
 	}
 
-	category, err := h.categoryService.UpdateCategory(req)
-
+	category, err := h.categoryService.UpdateCategory(id, req)
 	if err != nil {
+		if err.Error() == "category not found" {
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": "Category not found",
+			})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
-		})
-	}
-
-	if category == nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"message": "Category not found",
 		})
 		return
 	}
