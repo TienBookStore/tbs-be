@@ -13,5 +13,9 @@ func SetupCategoryRoute(router *gin.RouterGroup, cateHandler *handler.CategoryHa
 	category := router.Group("/categories")
 	{
 		category.POST("/create", middleware.AuthMiddleware(secretKey, userRepo), middleware.RoleMiddleware(entity.RoleAdmin), cateHandler.Create)
+		category.GET("/:id", cateHandler.GetByID)
+		category.GET("/", cateHandler.GetAll)
+		category.PUT("/update", middleware.AuthMiddleware(secretKey, userRepo), middleware.RoleMiddleware(entity.RoleAdmin), cateHandler.Update)
+		category.DELETE("/:id", middleware.AuthMiddleware(secretKey, userRepo), middleware.RoleMiddleware(entity.RoleAdmin), cateHandler.Delete)
 	}
 }
