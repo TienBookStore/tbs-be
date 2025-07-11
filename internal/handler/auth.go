@@ -159,3 +159,75 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 	c.SetCookie("jwt", "", -1, "/", "", false, true)
 	c.JSON(http.StatusOK, gin.H{"message": "đăng xuất thành công."})
 }
+
+func (h *AuthHandler) ForgotPassword(c *gin.Context) {
+	var req request.ReqForgotPassword
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+
+		return
+	}
+
+	err := h.authService.ForgotPassword(req)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Yêu cầu quên mật khẩu thành công, vui lòng kiểm tra email",
+	})
+}
+
+func (h *AuthHandler) VerifyForgotPassword(c *gin.Context) {
+	var req request.ReqVerifyForgotPassword
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+
+		return
+	}
+
+	if err := h.authService.VerifyForgotPassword(req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Xác minh thành công, vui lòng đặt lại mật khẩu",
+	})
+}
+
+func (h *AuthHandler) ResetPassword(c *gin.Context) {
+	var req request.ReqResetPassword
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if err := h.authService.ResetPassword(req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Reset mật khẩu thành công",
+	})
+}

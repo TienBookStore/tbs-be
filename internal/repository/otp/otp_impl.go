@@ -63,3 +63,7 @@ func (r *otpReposioryImpl) CheckExistsOTPByEmail(email string) (bool, error) {
 
 	return count > 0, nil
 }
+
+func (r *otpReposioryImpl) MarkOTPVerified(email string) error {
+	return r.db.Model(&entity.OTP{}).Where("email = ?", email).Update("verified", true).Error
+}

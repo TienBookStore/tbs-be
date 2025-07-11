@@ -45,7 +45,7 @@ func AuthMiddleware(secretKey string, userRepo repository.UserRepository) gin.Ha
 		}
 
 		c.Set("user", user)
-
+		
 		c.Next()
 	}
 }

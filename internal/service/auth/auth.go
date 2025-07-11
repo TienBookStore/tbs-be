@@ -11,4 +11,7 @@ type AuthService interface {
 	VerifyOTPSignUp(req request.ReqVerifyOTP) (*entity.User, error)
 	Login(req request.ReqLogin) (*entity.User, error)
 	ResendOTP(req request.ReqResendOTP) error
+	ForgotPassword(req request.ReqForgotPassword) error
+	VerifyForgotPassword(req request.ReqVerifyForgotPassword) error
+	ResetPassword(req request.ReqResetPassword) error
 }
