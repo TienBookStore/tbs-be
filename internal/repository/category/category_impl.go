@@ -17,7 +17,7 @@ func NewCategoryRepository(db *gorm.DB) CategoryRepository {
 	}
 }
 
-func (r *CategoryRepositoryImpl) GetCategoryByID(id uint) (*entity.Category, error) {
+func (r *CategoryRepositoryImpl) GetCategoryByID(id string) (*entity.Category, error) {
 	var category entity.Category
 
 	err := r.db.Where("id = ?", id).First(&category).Error
@@ -50,7 +50,7 @@ func (r *CategoryRepositoryImpl) CreateCategory(category *entity.Category) (*ent
 	return category, nil
 }
 
-func (r *CategoryRepositoryImpl) DeleteCategory(id uint) error {
+func (r *CategoryRepositoryImpl) DeleteCategory(id string) error {
 	result := r.db.Where("id = ?", id).Delete(&entity.Category{})
 
 	if result.Error != nil {

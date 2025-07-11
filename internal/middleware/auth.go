@@ -12,7 +12,6 @@ import (
 func AuthMiddleware(secretKey string, userRepo repository.UserRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr := extractToken(c)
-		fmt.Println("Token:", tokenStr)
 		if tokenStr == "" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing token"})
 			return
@@ -21,7 +20,7 @@ func AuthMiddleware(secretKey string, userRepo repository.UserRepository) gin.Ha
 		claims := jwt.MapClaims{}
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(t *jwt.Token) (interface{}, error) {
 			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("Unexpected signing method")
+				return nil, fmt.Errorf("unexpected signing method")
 			}
 			return []byte(secretKey), nil
 		})
@@ -31,7 +30,6 @@ func AuthMiddleware(secretKey string, userRepo repository.UserRepository) gin.Ha
 			return
 		}
 
-		// Lưu userID vào context
 		userID, ok := claims["user_id"].(string)
 		if !ok {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})

@@ -42,15 +42,16 @@ func (s *authServiceImpl) SignUp(req request.ReqSignUp) (*entity.User, error) {
 		return nil, customErrors.ErrorEmailExists
 	}
 
+	hashedPassword, err := utils.HashPassword(req.Password)
+	if err != nil {
+		return nil, fmt.Errorf("Lỗi băm mật khẩu: %v", err)
+	}
+
 	newUser := &entity.User{
 		ID:       uuid.NewString(),
 		FullName: req.FullName,
 		Email:    req.Email,
-		Password: req.Password,
-	}
-
-	if err = newUser.HashPassword(); err != nil {
-		return nil, errors.New("Lỗi băm mật khẩu")
+		Password: hashedPassword,
 	}
 
 	if err = s.userRepo.CreateUser(newUser); err != nil {
@@ -64,6 +65,7 @@ func (s *authServiceImpl) SignUp(req request.ReqSignUp) (*entity.User, error) {
 	}
 
 	newOTP := &entity.OTP{
+		ID:        uuid.NewString(),
 		Email:     req.Email,
 		Code:      codeOTP,
 		ExpiresAt: time.Now().Add(5 * time.Minute),
@@ -195,11 +197,32 @@ func (s *authServiceImpl) Login(req request.ReqLogin) (*entity.User, error) {
 		return nil, customErrors.ErrorUserNotActive
 	}
 
-	if !user.CheckPassword(req.Password) {
+	if !utils.CheckPassword(req.Password, user.Password) {
 		return nil, customErrors.ErrorInvalidCredentials
 	}
 
 	return user, nil
+}
+
+func (s *authServiceImpl) ChangePassword(user *entity.User, req request.ReqChangePassword) error {
+	if !utils.CheckPassword(req.OldPassword, user.Password) {
+		return customErrors.ErrorOldPasswordIncorrect
+	}
+
+	if req.OldPassword == req.NewPassword {
+		return errors.New("Mật khẩu mới không được trùng với mật khẩu cũ")
+	}
+
+	hashedPassword, err := utils.HashPassword(req.NewPassword)
+	if err != nil {
+		return fmt.Errorf("Lỗi băm mật khẩu: %v", err)
+	}
+	user.Password = hashedPassword
+	if err := s.userRepo.UpdateUser(user); err != nil {
+		return customErrors.ErrorUserUpdateFailed
+	}
+
+	return nil
 }
 
 func (s *authServiceImpl) ForgotPassword(req request.ReqForgotPassword) error {

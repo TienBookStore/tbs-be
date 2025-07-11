@@ -5,9 +5,9 @@ import (
 )
 
 type CategoryRepository interface {
-	GetCategoryByID(id uint) (*entity.Category, error)
+	GetCategoryByID(id string) (*entity.Category, error)
 	GetAllCategories() ([]entity.Category, error)
 	CreateCategory(category *entity.Category) (*entity.Category, error)
-	DeleteCategory(id uint) error
+	DeleteCategory(id string) error
 	UpdateCategory(category *entity.Category) (*entity.Category, error)
 }

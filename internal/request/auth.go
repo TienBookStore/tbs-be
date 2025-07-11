@@ -20,6 +20,11 @@ type ReqResendOTP struct {
 	Email string `json:"email" binding:"required,email"`
 }
 
+type ReqChangePassword struct {
+	OldPassword string `json:"old_password" binding:"required,min=6"`
+	NewPassword string `json:"new_password" binding:"required,min=6"`
+}
+
 type ReqForgotPassword struct {
 	Email string `json:"email" binding:"required,email"`
 }

@@ -5,9 +5,8 @@ import (
 )
 
 type OTP struct {
-	ID        uint   `gorm:"primaryKey"`
-	Email     string `gorm:"index;not null"`
-	Code      string `gorm:"not null"`
-	Verified  bool
+	ID        string    `json:"id" gorm:"type:varchar(36);primaryKey"`
+	Email     string    `gorm:"index;not null"`
+	Code      string    `gorm:"not null"`
 	ExpiresAt time.Time `gorm:"not null"`
 }

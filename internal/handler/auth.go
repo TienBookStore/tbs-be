@@ -160,6 +160,38 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "đăng xuất thành công."})
 }
 
+func (h *AuthHandler) ChangePassword(c *gin.Context) {
+	var req request.ReqChangePassword
+
+	userAny, exists := c.Get("user")
+
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Chưa đăng nhập",
+		})
+	}
+
+	user := userAny.(*entity.User)
+
+	if err := c.ShouldBind(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if err := h.authService.ChangePassword(user, req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Đổi mật khẩu thành công",
+	})
+}
+
 func (h *AuthHandler) ForgotPassword(c *gin.Context) {
 	var req request.ReqForgotPassword
 
