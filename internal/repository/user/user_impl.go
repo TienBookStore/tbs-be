@@ -59,6 +59,6 @@ func (r *userRepositoryImpl) GetUserByID(id string) (*entity.User, error) {
 		}
 
 		return nil, err
-	}	
+	}
 	return &user, nil
 }

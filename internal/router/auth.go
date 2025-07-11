@@ -18,5 +18,6 @@ func SetupAuthRoute(router *gin.RouterGroup, authHandler *handler.AuthHandler, u
 		auth.POST("/login", authHandler.Login)
 		auth.POST("/sign-up/resend-otp", authHandler.ResendOTPSignUp)
 		auth.POST("/logout", authHandler.Logout)
+		auth.PUT("/change-password", middleware.AuthMiddleware(secretKey, userRepo), authHandler.ChangePassword)
 	}
 }

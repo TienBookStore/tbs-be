@@ -2,8 +2,6 @@ package entity
 
 import (
 	"time"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -22,18 +20,4 @@ type User struct {
 	Password    string    `json:"-" gorm:"type:varchar(255);not null"`
 	CreatedAt   time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt   time.Time `json:"updated_at" gorm:"autoUpdateTime"`
-}
-
-func (u *User) HashPassword() error {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return err
-	}
-	u.Password = string(hashedPassword)
-	return nil
-}
-
-func (u *User) CheckPassword(password string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
-	return err == nil
 }

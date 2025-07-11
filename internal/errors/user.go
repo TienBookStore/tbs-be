@@ -4,6 +4,9 @@ import "errors"
 
 var (
 	ErrorEmailExists = errors.New("email đã tồn tại")
+	ErrorEmailNotFound = errors.New("email không tồn tại")
+	ErrorPasswordIncorrect = errors.New("mật khẩu không đúng")
+	ErrorOldPasswordIncorrect = errors.New("mật khẩu cũ không đúng")
 	ErrorUserNotFound = errors.New("không tìm thấy người dùng với email này")
 	ErrorUserNotActive = errors.New("người dùng chưa được kích hoạt, vui lòng kiểm tra email để kích hoạt tài khoản")
 	ErrorInvalidCredentials = errors.New("tên đăng nhập hoặc mật khẩu không đúng")
