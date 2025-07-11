@@ -243,6 +243,7 @@ func (s *authServiceImpl) ForgotPassword(req request.ReqForgotPassword) error {
 	}
 
 	newOTP := &entity.OTP{
+		ID:        uuid.NewString(),
 		Email:     req.Email,
 		Code:      codeOTP,
 		Verified:  false,
@@ -276,6 +277,16 @@ func (s *authServiceImpl) ForgotPassword(req request.ReqForgotPassword) error {
 }
 
 func (s *authServiceImpl) VerifyForgotPassword(req request.ReqVerifyForgotPassword) error {
+	exists, err := s.userRepo.CheckExistsByEmail(req.Email)
+
+	if err != nil {
+		return fmt.Errorf("Kiểm tra người dùng tồn tại thất bại: %w", err)
+	}
+
+	if !exists {
+		return cusErr.ErrorEmailNotFound
+	}
+	
 	otp, err := s.otpRepo.GetOTPByEmail(req.Email)
 
 	if err != nil {
@@ -322,9 +333,12 @@ func (s *authServiceImpl) ResetPassword(req request.ReqResetPassword) error {
 		return errors.New("Tài khoản không tồn tại hoặc chưa kích hoạt")
 	}
 
-	if err := user.HashPassword(); err != nil {
-		return fmt.Errorf("lỗi băm mật khẩu: %w", err)
+	hashed, err := utils.HashPassword(req.NewPassword)
+	if err != nil {
+		return fmt.Errorf("băm mật khẩu không thành công: %w", err)
 	}
+
+	user.Password = hashed
 
 	if err := s.userRepo.UpdateUser(user); err != nil {
 		return fmt.Errorf("lỗi cập nhật mật khẩu: %w", err)

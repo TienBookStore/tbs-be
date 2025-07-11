@@ -10,8 +10,8 @@ import (
 var (
 	smtpHost     = "smtp.gmail.com"
 	smtpPort     = 587
-	smtpUsername = "ngvantien1526@gmail.com"
-	smtpPassword = "owushoxkwzfmfxwu"
+	smtpUsername = "tienbookstore@gmail.com"
+	smtpPassword = "qsppxmglmzhaqshb"
 )
 
 func SendOTPByEmail(toEmail, subject, body string) error {
