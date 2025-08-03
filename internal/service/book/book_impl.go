@@ -80,3 +80,17 @@ func (s *bookServiceImpl) GetBookByID(id string) (*entity.Book, error) {
 
 	return book, nil
 }
+
+func (s *bookServiceImpl) GetAllBooks() ([]entity.Book, error) {
+	books, err := s.bookRepo.GetAllBooks()
+
+	if err != nil {
+		return nil, errors.New("failed to get all books: " + err.Error())
+	}
+
+	if books == nil {
+		return nil, nil // No books found
+	}
+
+	return books, nil
+}

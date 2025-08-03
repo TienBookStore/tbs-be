@@ -78,3 +78,22 @@ func (h *BookHandler) GetBookByID(c *gin.Context) {
 		Data: book,
 	})
 }
+
+func (h *BookHandler) GetAllBooks(c *gin.Context) {
+	books, err := h.bookService.GetAllBooks()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.Response{
+			Status: http.StatusInternalServerError,
+			Message: err.Error(),
+			Data: nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.Response{
+		Status: http.StatusOK,
+		Message: "Get all books successfully",
+		Data: books,
+	})
+}

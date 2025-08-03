@@ -8,4 +8,5 @@ import (
 type BookService interface {
 	CreateBook(req request.ReqCreateBook) (*entity.Book, error)
 	GetBookByID(id string) (*entity.Book, error)
+	GetAllBooks() ([]entity.Book, error)
 }
