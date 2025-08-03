@@ -66,3 +66,17 @@ func (s *bookServiceImpl) CreateBook(req request.ReqCreateBook) (*entity.Book, e
 
 	return book, nil
 }
+
+func (s *bookServiceImpl) GetBookByID(id string) (*entity.Book, error) {
+	book, err := s.bookRepo.GetBookByID(id)
+
+	if err != nil {
+		return nil, errors.New("failed to get book by ID: " + err.Error())
+	}
+
+	if book == nil {
+		return nil, nil // Book not found
+	}
+
+	return book, nil
+}
