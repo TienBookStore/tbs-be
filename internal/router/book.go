@@ -1,0 +1,17 @@
+package router
+
+import (
+	"backend/internal/entity"
+	"backend/internal/handler"
+	"backend/internal/middleware"
+	repository "backend/internal/repository/user"
+
+	"github.com/gin-gonic/gin"
+)
+
+func SetupBookRoute(router *gin.RouterGroup, bookHandler *handler.BookHandler, userRepo repository.UserRepository, secretKey string) {
+	book := router.Group("/book")
+	{
+		book.POST("/create", middleware.AuthMiddleware(secretKey, userRepo), middleware.RoleMiddleware(entity.RoleAdmin), bookHandler.CreateBook)
+	}
+}

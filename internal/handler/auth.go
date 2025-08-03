@@ -27,18 +27,28 @@ func (h *AuthHandler) GetMe(c *gin.Context) {
 	user, exists := c.Get("user")
 
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		c.JSON(http.StatusUnauthorized, utils.Response{
+			Status: http.StatusUnauthorized,
+			Message: "user not exists",
+			Data: nil,
+		})
 		return
 	}
 
 	user, ok := user.(*entity.User)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user"})
+		c.JSON(http.StatusInternalServerError, utils.Response{
+			Status: http.StatusInternalServerError,
+			Message: "Invalid user",
+			Data: nil,
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"user": user,
+	c.JSON(http.StatusOK, utils.Response{
+		Status: http.StatusOK,
+		Message: "Your profile",
+		Data: user,
 	})
 }
 

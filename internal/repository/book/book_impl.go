@@ -1,4 +1,4 @@
-package book
+package repository
 
 import (
 	"backend/internal/entity"
@@ -17,7 +17,7 @@ func NewBookRepository(db *gorm.DB) BookRepository {
 	}
 }
 
-func (r *BookRepositoryImpl) GetBookByID(id uint) (*entity.Book, error) {
+func (r *BookRepositoryImpl) GetBookByID(id string) (*entity.Book, error) {
 	var book entity.Book
 
 	err := r.db.Where("id = ?", id).First(&book).Error
@@ -50,7 +50,7 @@ func (r *BookRepositoryImpl) CreateBook(book *entity.Book) (*entity.Book, error)
 	return book, nil
 }
 
-func (r *BookRepositoryImpl) DeleteBook(id uint) error {
+func (r *BookRepositoryImpl) DeleteBook(id string) error {
 	result := r.db.Where("id = ?", id).Delete(&entity.Book{})
 
 	if result.Error != nil {
@@ -87,7 +87,7 @@ func (r *BookRepositoryImpl) SearchByTitle(title string) ([]entity.Book, error) 
 	return books, nil
 }
 
-func (r *BookRepositoryImpl) GetBooksByCategoryID(categoryID uint) ([]entity.Book, error) {
+func (r *BookRepositoryImpl) GetBooksByCategoryID(categoryID string) ([]entity.Book, error) {
 	var books []entity.Book
 
 	err := r.db.Table("books").
