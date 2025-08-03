@@ -97,3 +97,34 @@ func (h *BookHandler) GetAllBooks(c *gin.Context) {
 		Data: books,
 	})
 }
+ 
+func (h *BookHandler) UpdateBook(c *gin.Context) {
+	var req request.ReqUpdateBook
+	id := c.Param("id")
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, utils.Response{
+			Status: http.StatusBadRequest,
+			Message: err.Error(),
+			Data: nil,
+		})
+		return
+	}
+
+	book, err := h.bookService.UpdateBook(id, req)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.Response{
+			Status: http.StatusInternalServerError,
+			Message: err.Error(),
+			Data: nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.Response{
+		Status: http.StatusOK,
+		Message: "Update book successfully",
+		Data: book,
+	})
+}

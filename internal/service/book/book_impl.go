@@ -94,3 +94,52 @@ func (s *bookServiceImpl) GetAllBooks() ([]entity.Book, error) {
 
 	return books, nil
 }
+
+func (s *bookServiceImpl) UpdateBook(id string, req request.ReqUpdateBook) (*entity.Book, error) {
+	book, err := s.bookRepo.GetBookByID(id)
+
+	if err != nil {
+		return nil, errors.New("failed to get book by ID: " + err.Error())
+	}
+
+	if book == nil {
+		return nil, errors.New("book not found with ID: " + id)
+	}
+
+	book.Title = req.Title
+	book.Quantity = req.Quantity
+	book.Type = req.Type
+	book.Description = req.Description
+	book.Supplier = req.Supplier
+	book.Price = req.Price
+	book.Language = req.Language
+	book.Cover = req.Cover
+	book.Year = req.Year
+	book.PageNumber = req.PageNumber
+
+	var categories []entity.Category
+
+	for _, cateID := range req.CategoryIDs {
+		cate, err := s.cateRepo.GetCategoryByID(cateID)
+
+		if err != nil {
+			return nil, errors.New("failed to get category: " + err.Error())
+		}
+
+		if cate == nil {
+			return nil, errors.New("category not found with ID: " + cateID)
+		}
+
+		categories = append(categories, *cate)
+	}
+
+	book.Categories = categories
+
+	updatedBook, err := s.bookRepo.UpdateBook(book)
+
+	if err != nil {
+		return nil, errors.New("failed to update book: " + err.Error())
+	}
+
+	return updatedBook, nil
+}
