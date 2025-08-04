@@ -143,3 +143,14 @@ func (s *bookServiceImpl) UpdateBook(id string, req request.ReqUpdateBook) (*ent
 
 	return updatedBook, nil
 }
+
+func (s *bookServiceImpl) DeleteBook(id string) error {
+	
+	err := s.bookRepo.DeleteBook(id)
+
+	if err != nil {
+		return errors.New("failed to delete book: " + err.Error())
+	}
+
+	return nil
+}

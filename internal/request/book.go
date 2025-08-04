@@ -6,7 +6,7 @@ type ReqCreateBook struct {
 	Type        string   `json:"type"`
 	Description string   `json:"description"`
 	Supplier    string   `json:"supplier"`
-	Price       float64 `json:"price" binding:"required,gt=0"`
+	Price       float64  `json:"price" binding:"required,gt=0"`
 	Language    string   `json:"language"`
 	Cover       string   `json:"cover"`
 	Year        int      `json:"year"`
@@ -20,7 +20,7 @@ type ReqUpdateBook struct {
 	Type        string   `json:"type"`
 	Description string   `json:"description"`
 	Supplier    string   `json:"supplier"`
-	Price       float64 `json:"price" binding:"required,gt=0"`
+	Price       float64  `json:"price" binding:"required,gt=0"`
 	Language    string   `json:"language"`
 	Cover       string   `json:"cover"`
 	Year        int      `json:"year"`

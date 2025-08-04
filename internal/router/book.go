@@ -16,5 +16,6 @@ func SetupBookRoute(router *gin.RouterGroup, bookHandler *handler.BookHandler, u
 		book.GET("/:id", bookHandler.GetBookByID)
 		book.GET("/", bookHandler.GetAllBooks)
 		book.PUT("/:id", middleware.AuthMiddleware(secretKey, userRepo), middleware.RoleMiddleware(entity.RoleAdmin), bookHandler.UpdateBook)
+		book.DELETE("/:id", middleware.AuthMiddleware(secretKey, userRepo), middleware.RoleMiddleware(entity.RoleAdmin), bookHandler.DeleteBook)
 	}
 }

@@ -51,18 +51,26 @@ func (r *BookRepositoryImpl) CreateBook(book *entity.Book) (*entity.Book, error)
 }
 
 func (r *BookRepositoryImpl) DeleteBook(id string) error {
-	result := r.db.Where("id = ?", id).Delete(&entity.Book{})
+    var book entity.Book
 
-	if result.Error != nil {
-		return result.Error
-	}
+    // Lấy book ra trước
+    if err := r.db.Preload("Categories").First(&book, "id = ?", id).Error; err != nil {
+        return err
+    }
 
-	if result.RowsAffected == 0 {
-		return errors.New("book not found")
-	}
+    // Xóa liên kết many-to-many
+    if err := r.db.Model(&book).Association("Categories").Clear(); err != nil {
+        return err
+    }
 
-	return nil
+    // Xóa book theo ID để tránh lỗi ORDER BY
+    if err := r.db.Delete(&entity.Book{}, "id = ?", id).Error; err != nil {
+        return err
+    }
+
+    return nil
 }
+
 
 func (r *BookRepositoryImpl) UpdateBook(book *entity.Book) (*entity.Book, error) {
 	if err := r.db.Save(book).Error; err != nil {

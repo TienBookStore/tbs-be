@@ -128,3 +128,32 @@ func (h *BookHandler) UpdateBook(c *gin.Context) {
 		Data: book,
 	})
 }
+
+func (h *BookHandler) DeleteBook(c *gin.Context) {
+	id := c.Param("id")
+
+	err := h.bookService.DeleteBook(id)
+
+	if err != nil {
+		if err.Error() == "book not found" {
+			c.JSON(http.StatusNotFound, utils.Response{
+				Status: http.StatusNotFound,
+				Message: "Book not found",
+				Data: nil,
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, utils.Response{
+			Status: http.StatusInternalServerError,
+			Message: err.Error(),
+			Data: nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.Response{
+		Status: http.StatusOK,
+		Message: "Delete book successfully",
+		Data: nil,
+	})
+}
